@@ -21,4 +21,5 @@ int main(){
         str3[k]='\0';
         printf("%s\n",str3);
     }
+
 }
