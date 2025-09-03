@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class VerificacaoAnagrama {
     public static void main (String[] args){
         Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine(); // Le as primeiras frases
+        String str = MyIO.readLine(); // Le as primeiras frases
         // Loop até a palavra inserida for FIM
         while(!(str.length() == 3 && str.charAt(0) == 'F' && str.charAt(1) == 'I' && str.charAt(2) == 'M')){
             char[] palavra1 = new char[1000]; // palavra1 é um array para guardar a primeira palavra
@@ -58,14 +58,14 @@ public class VerificacaoAnagrama {
 
                 // Chamando o metodo para verificar se as duas palavras sao ou nao anagramas e imprimir sim ou nao
                 if(verificarAnagrama(palavra1,palavra2,tam1)==true){
-                    System.out.println("SIM");
+                    MyIO.println("SIM");
                 }else{
-                    System.out.println("NAO");
+                    MyIO.println("NÃO");
                 }
             }else{ // Caso as duas palavras nao tenham o mesmo tamanho, NAO é anagrama
-                System.out.println("NAO");
+                MyIO.println("NÃO");
             }
-            str = sc.nextLine(); // Ler a proxima linha para continuar o loop
+            str = MyIO.readLine(); // Ler a proxima linha para continuar o loop
         }
     }
     // Verifica se é um anagrama ou nao
