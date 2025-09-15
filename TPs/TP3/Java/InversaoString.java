@@ -10,6 +10,7 @@ public class InversaoString{
             System.out.println();
             frase = sc.nextLine();
         }
+        sc.close();
     }
 
     public static void Inversao (String frase, int tam){
