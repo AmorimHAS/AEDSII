@@ -9,7 +9,7 @@
 
 ## 2. Desempenho Observado
 
-Os testes foram realizados com arrays de 100, 1.000 e 10.000 elementos, nos cenários: ordenado, quase ordenado e aleatório. O tempo de execução foi medido em nanossegundos e milissegundos (com casas decimais) para cada estratégia:
+Os testes foram realizados com arrays de 100, 1.000 e 10.000 elementos, nos cenários: ordenado, quase ordenado e aleatório. O tempo de execução foi medido em milissegundos para cada estratégia:
 
 ### Resultados dos testes
 
@@ -93,16 +93,12 @@ Tipo: Aleatório
 | Aleatório          | 0,077 ms      | 0,099 ms      | 0,968 ms        |
 | Mediana de três    | 0,022 ms      | 0,038 ms      | 0,511 ms        |
 
-Essas tabelas funcionam como gráficos comparativos, facilitando a visualização das diferenças de desempenho entre as estratégias de escolha do pivô.
-
-Esses resultados mostram que as estratégias de pivô fixo (primeiro/último elemento) têm desempenho muito inferior em arrays ordenados grandes, enquanto as demais mantêm desempenho estável e eficiente.
-
-## 3. Discussão
-
-- Estratégias fixas (primeiro/último elemento) tendem a ser menos eficientes em arrays ordenados/quase ordenados, pois geram partições desbalanceadas.
-- O pivô aleatório melhora o desempenho médio, evitando o pior caso.
-- A mediana de três geralmente apresenta o melhor desempenho, pois evita extremos e gera partições mais equilibradas.
-
 ## 4. Conclusão
 
-A escolha do pivô é determinante para o desempenho do QuickSort, especialmente em arrays grandes ou com padrões específicos. Estratégias fixas (primeiro/último elemento) podem ser muito ineficientes em dados ordenados, enquanto o pivô aleatório e a mediana de três mantêm desempenho estável e eficiente na maioria dos cenários. A mediana de três, em especial, tende a evitar partições desbalanceadas, sendo a mais indicada para uso geral. Para uma análise mais precisa, é fundamental realizar testes com grandes volumes de dados e múltiplas execuções, observando sempre o perfil dos dados a serem ordenados.
+A escolha do pivô no QuickSort é super importante pro desempenho, ainda mais em listas grandes ou com padrões. Nossos testes mostraram que usar o primeiro ou o último elemento como pivô é muito ruim se a lista já estiver ordenada. O algoritmo fica lentíssimo e as divisões ficam todas desequilibradas.
+
+Por outro lado, o pivô aleatório e, principalmente, a mediana de três, funcionam muito bem em qualquer situação. Eles conseguem manter o QuickSort rápido porque evitam o pior caso.
+
+Em listas quase ordenadas ou totalmente aleatórias, todas as estratégias até que vão bem, mas a mediana de três é a melhor opção pra garantir que as partições fiquem equilibradas, sendo a mais indicada para uso geral. O pivô aleatório também é uma boa pedida, diminuindo os riscos.
+
+A dica é: evite pivôs fixos em aplicações de verdade, a não ser que você saiba exatamente como são seus dados. O ideal é ir de mediana de três ou pivô aleatório. E claro, sempre teste! Com diferentes dados e tamanhos, pra ter certeza que o QuickSort vai performar do jeito certo.
