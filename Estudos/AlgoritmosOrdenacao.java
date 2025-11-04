@@ -1,7 +1,7 @@
 public class AlgoritmosOrdenacao {
     public static void main (String[] args){
         int[] array = new int[]{28,5,6,23,45,6,34,435,463,63,34};
-        int n=11;
+        int n=array.length();
 
         //Algoritmo de Selecao
         for(int i=0;i<n-1;i++){
@@ -25,6 +25,17 @@ public class AlgoritmosOrdenacao {
                 j--;
             }
             array[j+1]=temp;
+        }
+
+        //Algoritmo de Bubblesort
+        for(int i=array.length-1;i>0;i++){
+            for(int j=0;j<i;j++){
+                if(array[j]>array[j+1]){
+                    int tmp = array[j+1];
+                    array[j+1]=array[j];
+                    array[j]=tmp;
+                }
+            }
         }
 
         //Melhoria Selecao
