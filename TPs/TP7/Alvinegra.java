@@ -114,7 +114,7 @@ class AlvinegraArvore {
 
     // Pesquisar e mostrar caminho
     public boolean pesquisar(String nome) {
-        AAlvinegra.logWriter.print(nome + ": =>raiz  ");
+        Alvinegra.logWriter.print(nome + ": =>raiz  ");
         System.out.print(nome + ": =>raiz  ");
         return pesquisar(nome, raiz);
     }
@@ -123,18 +123,18 @@ class AlvinegraArvore {
         boolean resp;
         if (i == null) {
             resp = false;
-            AAlvinegra.logWriter.println("NAO");
+            Alvinegra.logWriter.print(nome + "NAO");
             System.out.println("NAO");
         } else if (nome.equals(i.game.name)) {
             resp = true;
-            AAlvinegra.logWriter.println("SIM");
+            Alvinegra.logWriter.print(nome + "SIM");
             System.out.println("SIM");
         } else if (nome.compareTo(i.game.name) < 0) {
-            AAlvinegra.logWriter.print("esq ");
+            Alvinegra.logWriter.print(nome + "esq ");
             System.out.print("esq ");
             resp = pesquisar(nome, i.esq);
         } else {
-            AAlvinegra.logWriter.print("dir ");
+            Alvinegra.logWriter.print(nome + "esq ");
             System.out.print("dir ");
             resp = pesquisar(nome, i.dir);
         }
@@ -156,28 +156,28 @@ class AlvinegraArvore {
         // Senao, se a arvore tiver dois names/games (raiz e dir)
         } else if (raiz.esq == null) {
             if (game.name.compareTo(raiz.game.name) < 0) {
-                raiz.esq = new NoAN(raiz.game, false);
-                raiz.game = game;
+                raiz.esq = new NoAN(game, false);
             } else if (game.name.compareTo(raiz.dir.game.name) < 0) {
                 raiz.esq = new NoAN(game, false);
+                raiz.game.name = game.name;
             } else {
-                raiz.esq = new NoAN(raiz.game, false);
-                raiz.game = raiz.dir.game;
-                raiz.dir.game = game;
+                raiz.esq = new NoAN(game, false);
+                raiz.game.name = raiz.dir.game.name;
+                raiz.dir.game.name = game.name;
             }
             raiz.esq.cor = raiz.dir.cor = false;
 
         // Senao, se a arvore tiver dois names/games (raiz e esq)
         } else if (raiz.dir == null) {
             if (game.name.compareTo(raiz.game.name) > 0) {
-                raiz.dir = new NoAN(raiz.game, false);
-                raiz.game = game;
+                raiz.dir = new NoAN(game, false);
             } else if (game.name.compareTo(raiz.esq.game.name) > 0) {
                 raiz.dir = new NoAN(game, false);
+                raiz.game.name = game.name;
             } else {
-                raiz.dir = new NoAN(raiz.game, false);
-                raiz.game = raiz.esq.game;
-                raiz.esq.game = game;
+                raiz.dir = new NoAN(game, false);
+                raiz.game.name = raiz.esq.game.name;
+                raiz.esq.game.name = game.name;
             }
             raiz.esq.cor = raiz.dir.cor = false;
 
@@ -190,7 +190,7 @@ class AlvinegraArvore {
 
     //Balancear a árvore
     private void balancear(NoAN bisavo, NoAN avo, NoAN pai, NoAN i) {
-        // Se o pai tambem e vermelho, reequilibrar a arvore, rotacionando o avo
+        // Se o pai tambem e preto, reequilibrar a arvore, rotacionando o avo
         if (pai.cor == true) {
             if (pai.game.name.compareTo(avo.game.name) > 0) { // rotacao a esquerda ou direita-esquerda
                 if (i.game.name.compareTo(pai.game.name) > 0) {
@@ -214,8 +214,7 @@ class AlvinegraArvore {
             }
             // reestabelecer as cores apos a rotacao
             avo.cor = false;
-            if (avo.esq != null) avo.esq.cor = true;
-            if (avo.dir != null) avo.dir.cor = true;
+            avo.esq.cor = avo.dir.cor = true;
         } 
     }
 
@@ -244,8 +243,9 @@ class AlvinegraArvore {
                 inserir(game, avo, pai, i, i.esq);
             } else if (game.name.compareTo(i.game.name) > 0) {
                 inserir(game, avo, pai, i, i.dir);
+            } else {
+                throw new Exception("Erro inserir (name/game repetido)!");
             }
-            // Se o jogo já existe (nome igual), simplesmente ignora
         }
     }
 
@@ -281,7 +281,7 @@ class AlvinegraArvore {
 }
 
 // Classe principal
-public class AAlvinegra {
+public class Alvinegra {
     public static Scanner sc;
     public static PrintWriter logWriter;
 
@@ -308,7 +308,7 @@ public class AAlvinegra {
         entrada = sc.nextLine();
         while (!entrada.equals("FIM")) {
             try {
-                arvore.pesquisar(entrada.trim());
+                arvore.pesquisar(entrada);
             } catch (Exception e) {
                 System.err.println("Erro: " + e.getMessage());
             }
@@ -337,8 +337,10 @@ class JogosDIgitadosAN {
         ids = idArray;
         idsTamanho = tamanho;
 
-        // Para cada ID fornecido, busca no arquivo
+        // Pesquisa por id
         for (int j = 0; j < tamanho; j++) {
+            int indiceEncontrado = -1;
+
             try {
                 java.io.File arquivo = new java.io.File("/tmp/games.csv");
                 if (!arquivo.exists()) {
@@ -346,23 +348,21 @@ class JogosDIgitadosAN {
                     return arvore;
                 }
 
-                InputStream is = new FileInputStream(arquivo);
+                InputStream is = new FileInputStream(arquivo); // abre do zero
                 Scanner sc = new Scanner(is);
 
                 // Pula cabeçalho
                 if (sc.hasNextLine())
                     sc.nextLine();
 
-                int idProcurado = Integer.parseInt(ids[j]);
-                boolean encontrado = false;
-
-                while (sc.hasNextLine() && !encontrado) {
+                while (sc.hasNextLine() && indiceEncontrado == -1) {
                     String linha = sc.nextLine();
                     contador = 0;
 
                     int id = capturaId(linha);
+                    indiceEncontrado = igualId(id);
 
-                    if (id == idProcurado) {
+                    if (indiceEncontrado != -1) {
                         String name = capturaName(linha);
                         String releaseDate = capturaReleaseDate(linha);
                         int estimatedOwners = capturaEstimatedOwners(linha);
@@ -389,9 +389,8 @@ class JogosDIgitadosAN {
                                 supportedLanguages, supportedLanguagesCount, metacriticScore, userScore, achievements,
                                 publishers, publishersCount, developers, developersCount, categories, categoriesCount,
                                 genres, genresCount, tags, tagsCount);
-                        
+                        removerId(indiceEncontrado);
                         arvore.inserir(jogo);
-                        encontrado = true;
                     }
                 }
 
@@ -406,16 +405,16 @@ class JogosDIgitadosAN {
         return arvore;
     }
 
-    // Função para verificar se o ID já foi pesquisado (não usada mais)
+    // Função para verificar se o ID já foi pesquisado
     static int igualId(int id) {
         for (int i = 0; i < idsTamanho; i++) {
-            if (Integer.parseInt(ids[i]) == id)
-                return i;
+            if (Integer.parseInt(ids[0]) == id)
+                return 0;
         }
         return -1;
     }
 
-    // Função para remover o ID da lista de pesquisa (não usada mais)
+    // Função para remover o ID da lista de pesquisa
     static void removerId(int indice) {
         if (indice >= 0 && indice < idsTamanho) {
             for (int j = indice; j < idsTamanho - 1; j++) {
@@ -447,7 +446,7 @@ class JogosDIgitadosAN {
             name += jogo.charAt(contador);
             contador++;
         }
-        return name.trim();
+        return name;
     }
 
     // Capturando Release Date
