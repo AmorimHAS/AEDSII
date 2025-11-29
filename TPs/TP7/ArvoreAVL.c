@@ -88,7 +88,7 @@ int main()
     const char *filePath = "/tmp/games.csv";
     
     // Configuração para log (simulação do log em Java)
-    FILE *logFile = fopen("885637_av.txt", "w");
+    FILE *logFile = fopen("885_av.txt", "w");
     if (logFile == NULL) {
         perror("Erro ao criar arquivo de log");
         return 1;

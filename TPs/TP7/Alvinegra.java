@@ -1,680 +1,658 @@
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Scanner;
+import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.text.*;
 
-class NoArrayListAN {
-    public static final int MAX_GAMES = 500;
-    public static final int MAX_INNER_ARRAY = 50;
-    public static final int MAX_IDS = 100;
-}
+class Games {
+    // ============================================================================
+    // CAMPOS PRINCIPAIS DA ENTIDADE
+    // ============================================================================
+    private int id;
+    private String name;
+    private String releasedate;
+    private int estimatedOwners;
+    private float price;
+    private String[] supportedLanguages;
+    private int metacriticScore;
+    private float userScore;
+    private int achievements;
+    private String[] publishers;
+    private String[] developers;
+    private String[] categories;
+    private String[] genres;
+    private String[] tags;
 
-class GameAN {
-    int id;
-    String name;
-    String releaseDate;
-    int estimatedOwners;
-    float price;
-    String[] supportedLanguages;
-    int supportedLanguagesCount;
-    int metacriticScore;
-    float userScore;
-    int achievements;
-    String[] publishers;
-    int publishersCount;
-    String[] developers;
-    int developersCount;
-    String[] categories;
-    int categoriesCount;
-    String[] genres;
-    int genresCount;
-    String[] tags;
-    int tagsCount;
-
-    GameAN() {
+    // ============================================================================
+    // CONSTRUTOR PADRÃO (ESTADO INICIAL)
+    // ============================================================================
+    public Games() {
         this.id = 0;
         this.name = "";
-        this.releaseDate = "";
+        this.releasedate = "";
         this.estimatedOwners = 0;
         this.price = 0.0f;
-        this.supportedLanguages = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.supportedLanguagesCount = 0;
+        this.supportedLanguages = new String[0];
         this.metacriticScore = -1;
         this.userScore = -1.0f;
         this.achievements = 0;
-        this.publishers = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.publishersCount = 0;
-        this.developers = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.developersCount = 0;
-        this.categories = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.categoriesCount = 0;
-        this.genres = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.genresCount = 0;
-        this.tags = new String[NoArrayListAN.MAX_INNER_ARRAY];
-        this.tagsCount = 0;
+        this.publishers = new String[0];
+        this.developers = new String[0];
+        this.categories = new String[0];
+        this.genres = new String[0];
+        this.tags = new String[0];
     }
 
-    GameAN(int id, String name, String releaseDate, int estimatedOwners, float price,
-            String[] supportedLanguages, int supportedLanguagesCount, int metacriticScore, float userScore,
-            int achievements,
-            String[] publishers, int publishersCount, String[] developers, int developersCount,
-            String[] categories, int categoriesCount, String[] genres, int genresCount, String[] tags, int tagsCount) {
+    // ============================================================================
+    // CONSTRUTOR COMPLETO (PREENCHIMENTO TOTAL)
+    // ============================================================================
+    public Games(int id, String name, String releasedate, int estimatedOwners, float price, String[] supportedLanguages,
+            int metacriticScore, float userScore, int achievements, String[] publishers, String[] developers,
+            String[] categories, String[] genres, String[] tags) {
         this.id = id;
         this.name = name;
-        this.releaseDate = releaseDate;
+        this.releasedate = releasedate;
         this.estimatedOwners = estimatedOwners;
         this.price = price;
-
-        // Copiando arrays
         this.supportedLanguages = supportedLanguages;
-        this.supportedLanguagesCount = supportedLanguagesCount;
-        this.publishers = publishers;
-        this.publishersCount = publishersCount;
-        this.developers = developers;
-        this.developersCount = developersCount;
-        this.categories = categories;
-        this.categoriesCount = categoriesCount;
-        this.genres = genres;
-        this.genresCount = genresCount;
-        this.tags = tags;
-        this.tagsCount = tagsCount;
-
         this.metacriticScore = metacriticScore;
         this.userScore = userScore;
         this.achievements = achievements;
-    }
-}
-
-// No
-class NoAN {
-    public boolean cor;
-    public GameAN game;
-    public NoAN esq, dir;
-
-    public NoAN() {
-        this(null, false);
+        this.publishers = publishers;
+        this.developers = developers;
+        this.categories = categories;
+        this.genres = genres;
+        this.tags = tags;
     }
 
-    public NoAN(GameAN game, boolean cor) {
-        this.cor = cor;
-        this.game = game;
-        esq = dir = null;
-    }
-}
-
-// Ávore Alvinegra
-class AlvinegraArvore {
-    private NoAN raiz;
-
-    public AlvinegraArvore() {
-        raiz = null;
+    // ============================================================================
+    // MÉTODOS DE ACESSO (GET / SET)
+    // ============================================================================
+    public void setId(int id) {
+        this.id = id;
     }
 
-    // Pesquisar e mostrar caminho
-    public boolean pesquisar(String nome) {
-        Alvinegra.logWriter.print(nome + ": =>raiz  ");
-        System.out.print(nome + ": =>raiz  ");
-        return pesquisar(nome, raiz);
-    }
-
-    private boolean pesquisar(String nome, NoAN i) {
-        boolean resp;
-        if (i == null) {
-            resp = false;
-            Alvinegra.logWriter.print(nome + "NAO");
-            System.out.println("NAO");
-        } else if (nome.equals(i.game.name)) {
-            resp = true;
-            Alvinegra.logWriter.print(nome + "SIM");
-            System.out.println("SIM");
-        } else if (nome.compareTo(i.game.name) < 0) {
-            Alvinegra.logWriter.print(nome + "esq ");
-            System.out.print("esq ");
-            resp = pesquisar(nome, i.esq);
-        } else {
-            Alvinegra.logWriter.print(nome + "esq ");
-            System.out.print("dir ");
-            resp = pesquisar(nome, i.dir);
-        }
-        return resp;
-    }
-
-    // Inserir manualmente (3 primeiros elementos)
-    public void inserir(GameAN game) throws Exception {
-        // Se a arvore estiver vazia
-        if (raiz == null) {
-            raiz = new NoAN(game, false);  
-        // Senao, se a arvore tiver um names/games
-        } else if (raiz.esq == null && raiz.dir == null) {
-            if (game.name.compareTo(raiz.game.name) < 0) {
-                raiz.esq = new NoAN(game, false);
-            } else {
-                raiz.dir = new NoAN(game, false);
-            }
-        // Senao, se a arvore tiver dois names/games (raiz e dir)
-        } else if (raiz.esq == null) {
-            if (game.name.compareTo(raiz.game.name) < 0) {
-                raiz.esq = new NoAN(game, false);
-            } else if (game.name.compareTo(raiz.dir.game.name) < 0) {
-                raiz.esq = new NoAN(game, false);
-                raiz.game.name = game.name;
-            } else {
-                raiz.esq = new NoAN(game, false);
-                raiz.game.name = raiz.dir.game.name;
-                raiz.dir.game.name = game.name;
-            }
-            raiz.esq.cor = raiz.dir.cor = false;
-
-        // Senao, se a arvore tiver dois names/games (raiz e esq)
-        } else if (raiz.dir == null) {
-            if (game.name.compareTo(raiz.game.name) > 0) {
-                raiz.dir = new NoAN(game, false);
-            } else if (game.name.compareTo(raiz.esq.game.name) > 0) {
-                raiz.dir = new NoAN(game, false);
-                raiz.game.name = game.name;
-            } else {
-                raiz.dir = new NoAN(game, false);
-                raiz.game.name = raiz.esq.game.name;
-                raiz.esq.game.name = game.name;
-            }
-            raiz.esq.cor = raiz.dir.cor = false;
-
-            // Senao, a arvore tem tres ou mais names/games
-        } else {
-            inserir(game, null, null, null, raiz);
-        }
-        raiz.cor = false;
-    }
-
-    //Balancear a árvore
-    private void balancear(NoAN bisavo, NoAN avo, NoAN pai, NoAN i) {
-        // Se o pai tambem e preto, reequilibrar a arvore, rotacionando o avo
-        if (pai.cor == true) {
-            if (pai.game.name.compareTo(avo.game.name) > 0) { // rotacao a esquerda ou direita-esquerda
-                if (i.game.name.compareTo(pai.game.name) > 0) {
-                    avo = rotacaoEsq(avo);
-                } else {
-                    avo = rotacaoDirEsq(avo);
-                }
-            } else { // rotacao a direita ou esquerda-direita
-                if (i.game.name.compareTo(pai.game.name) < 0) {
-                    avo = rotacaoDir(avo);
-                } else {
-                    avo = rotacaoEsqDir(avo);
-                }
-            }
-            if (bisavo == null) {
-                raiz = avo;
-            } else if (avo.game.name.compareTo(bisavo.game.name) < 0) {
-                bisavo.esq = avo;
-            } else {
-                bisavo.dir = avo;
-            }
-            // reestabelecer as cores apos a rotacao
-            avo.cor = false;
-            avo.esq.cor = avo.dir.cor = true;
-        } 
-    }
-
-    // Inserir recursivo geral
-    private void inserir(GameAN game, NoAN bisavo, NoAN avo, NoAN pai, NoAN i) throws Exception {
-        if (i == null) {
-            if (game.name.compareTo(pai.game.name) < 0) {
-                i = pai.esq = new NoAN(game, true);
-            } else {
-                i = pai.dir = new NoAN(game, true);
-            }
-            if (pai.cor == true) {
-                balancear(bisavo, avo, pai, i);
-            }
-        } else {
-            if (i.esq != null && i.dir != null && i.esq.cor == true && i.dir.cor == true) {
-                i.cor = true;
-                i.esq.cor = i.dir.cor = false;
-                if (i == raiz) {
-                    i.cor = false;
-                } else if (pai.cor == true) {
-                    balancear(bisavo, avo, pai, i);
-                }
-            }
-            if (game.name.compareTo(i.game.name) < 0) {
-                inserir(game, avo, pai, i, i.esq);
-            } else if (game.name.compareTo(i.game.name) > 0) {
-                inserir(game, avo, pai, i, i.dir);
-            } else {
-                throw new Exception("Erro inserir (name/game repetido)!");
-            }
-        }
-    }
-
-    // Rotação simples e dupla
-    private NoAN rotacaoDir(NoAN no) {
-        NoAN noEsq = no.esq;
-        NoAN noEsqDir = noEsq.dir;
-
-        noEsq.dir = no;
-        no.esq = noEsqDir;
-
-        return noEsq;
-    }
-
-    private NoAN rotacaoEsq(NoAN no) {
-        NoAN noDir = no.dir;
-        NoAN noDirEsq = noDir.esq;
-
-        noDir.esq = no;
-        no.dir = noDirEsq;
-        return noDir;
-    }
-
-    private NoAN rotacaoDirEsq(NoAN no) {
-        no.dir = rotacaoDir(no.dir);
-        return rotacaoEsq(no);
-    }
-
-    private NoAN rotacaoEsqDir(NoAN no) {
-        no.esq = rotacaoEsq(no.esq);
-        return rotacaoDir(no);
-    }
-}
-
-// Classe principal
-public class Alvinegra {
-    public static Scanner sc;
-    public static PrintWriter logWriter;
-
-    // Main
-    public static void main(String[] args) {
-        sc = new Scanner(System.in);
-        // .log
-        try {
-            logWriter = new PrintWriter(new FileWriter("885637_arvoreAlvinegra.txt"));
-        } catch (IOException e) {
-            System.err.println("Erro ao criar o arquivo de log: " + e.getMessage());
-        }
-        // Capturando os ids que serão adicionados
-        String entrada = sc.nextLine();
-        String ids[] = new String[2000];
-        int tam = 0;
-        for (; !entrada.equals("FIM"); tam++) {
-            ids[tam] = entrada;
-            entrada = sc.nextLine();
-        }
-        // Criando a árvore
-        AlvinegraArvore arvore = JogosDIgitadosAN.inicializacao(ids, tam);
-        // Vendo a posição na árvore e mostrando
-        entrada = sc.nextLine();
-        while (!entrada.equals("FIM")) {
-            try {
-                arvore.pesquisar(entrada);
-            } catch (Exception e) {
-                System.err.println("Erro: " + e.getMessage());
-            }
-            entrada = sc.nextLine();
-        }
-        sc.close();
-        logWriter.close();
-    }
-}
-
-// Capturando os jogos digitados através do id pelo usuário
-class JogosDIgitadosAN {
-    // Scanner
-    public static Scanner sc;
-    // Variável que pula caracteres das linhas
-    static int contador = 0;
-    // Ids de pesquisa e seu tamanho
-    static String[] ids;
-    static int idsTamanho;
-
-    // Capturando os jogos
-    static AlvinegraArvore inicializacao(String[] idArray, int tamanho) {
-        AlvinegraArvore arvore = new AlvinegraArvore();
-
-        // Copiando IDs para a variável de classe 'ids'
-        ids = idArray;
-        idsTamanho = tamanho;
-
-        // Pesquisa por id
-        for (int j = 0; j < tamanho; j++) {
-            int indiceEncontrado = -1;
-
-            try {
-                java.io.File arquivo = new java.io.File("/tmp/games.csv");
-                if (!arquivo.exists()) {
-                    System.out.println("Arquivo 'games.csv' não encontrado!");
-                    return arvore;
-                }
-
-                InputStream is = new FileInputStream(arquivo); // abre do zero
-                Scanner sc = new Scanner(is);
-
-                // Pula cabeçalho
-                if (sc.hasNextLine())
-                    sc.nextLine();
-
-                while (sc.hasNextLine() && indiceEncontrado == -1) {
-                    String linha = sc.nextLine();
-                    contador = 0;
-
-                    int id = capturaId(linha);
-                    indiceEncontrado = igualId(id);
-
-                    if (indiceEncontrado != -1) {
-                        String name = capturaName(linha);
-                        String releaseDate = capturaReleaseDate(linha);
-                        int estimatedOwners = capturaEstimatedOwners(linha);
-                        float price = capturaPrice(linha);
-
-                        String[] supportedLanguages = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int supportedLanguagesCount = capturaSupportedLanguages(linha, supportedLanguages);
-                        int metacriticScore = capturaMetacriticScore(linha);
-                        float userScore = capturaUserScore(linha);
-                        int achievements = capturaAchievements(linha);
-
-                        String[] publishers = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int publishersCount = capturaUltimosArryays(linha, publishers);
-                        String[] developers = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int developersCount = capturaUltimosArryays(linha, developers);
-                        String[] categories = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int categoriesCount = capturaUltimosArryays(linha, categories);
-                        String[] genres = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int genresCount = capturaUltimosArryays(linha, genres);
-                        String[] tags = new String[NoArrayListAN.MAX_INNER_ARRAY];
-                        int tagsCount = capturaUltimosArryays(linha, tags);
-
-                        GameAN jogo = new GameAN(id, name, releaseDate, estimatedOwners, price,
-                                supportedLanguages, supportedLanguagesCount, metacriticScore, userScore, achievements,
-                                publishers, publishersCount, developers, developersCount, categories, categoriesCount,
-                                genres, genresCount, tags, tagsCount);
-                        removerId(indiceEncontrado);
-                        arvore.inserir(jogo);
-                    }
-                }
-
-                sc.close();
-                is.close();
-
-            } catch (Exception e) {
-                System.out.println("Erro ao abrir ou ler o arquivo: " + e.getMessage());
-            }
-        }
-
-        return arvore;
-    }
-
-    // Função para verificar se o ID já foi pesquisado
-    static int igualId(int id) {
-        for (int i = 0; i < idsTamanho; i++) {
-            if (Integer.parseInt(ids[0]) == id)
-                return 0;
-        }
-        return -1;
-    }
-
-    // Função para remover o ID da lista de pesquisa
-    static void removerId(int indice) {
-        if (indice >= 0 && indice < idsTamanho) {
-            for (int j = indice; j < idsTamanho - 1; j++) {
-                ids[j] = ids[j + 1];
-            }
-            ids[idsTamanho - 1] = null; // Limpa a última posição
-            idsTamanho--; // Decrementa o tamanho
-        }
-    }
-
-    // Capturando Id
-    static int capturaId(String jogo) {
-        int id = 0;
-        while (contador < jogo.length() && Character.isDigit(jogo.charAt(contador))) {
-            id = id * 10 + (jogo.charAt(contador) - '0');
-            contador++;
-        }
+    public int getId() {
         return id;
     }
 
-    // Capturando nome
-    static String capturaName(String jogo) {
-        String name = "";
-        while (jogo.charAt(contador) != ',' && contador < jogo.length()) {
-            contador++;
-        }
-        contador++;
-        while (jogo.charAt(contador) != ',' && contador < jogo.length()) {
-            name += jogo.charAt(contador);
-            contador++;
-        }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
         return name;
     }
 
-    // Capturando Release Date
-    static String capturaReleaseDate(String jogo) {
-        while (contador < jogo.length() && jogo.charAt(contador) != '"') {
-            contador++;
-        }
-        contador++;
-        String dia = "", mes = "", ano = "";
-        // Pegando mês
-        for (int i = 0; contador < jogo.length() && i < 3; i++) {
-            mes += jogo.charAt(contador);
-            contador++;
-        }
-        mes = mes.trim();
-        switch (mes) {
-            case "Jan":
-                mes = "01";
-                break;
-            case "Feb":
-                mes = "02";
-                break;
-            case "Mar":
-                mes = "03";
-                break;
-            case "Apr":
-                mes = "04";
-                break;
-            case "May":
-                mes = "05";
-                break;
-            case "Jun":
-                mes = "06";
-                break;
-            case "Jul":
-                mes = "07";
-                break;
-            case "Aug":
-                mes = "08";
-                break;
-            case "Sep":
-                mes = "09";
-                break;
-            case "Oct":
-                mes = "10";
-                break;
-            case "Nov":
-                mes = "11";
-                break;
-            case "Dec":
-                mes = "12";
-                break;
-            default:
-                break;
-        }
-        // Pulando espaço
-        while (contador < jogo.length() && !Character.isDigit(jogo.charAt(contador)) && jogo.charAt(contador) != ',') {
-            contador++;
-        }
-        // Pegando dia
-        while (contador < jogo.length() && Character.isDigit(jogo.charAt(contador))) {
-            dia += jogo.charAt(contador);
-            contador++;
-        }
-        // Pulando espaço
-        while (contador < jogo.length() && !Character.isDigit(jogo.charAt(contador))) {
-            contador++;
-        }
-        // Pegando ano
-        while (contador < jogo.length() && jogo.charAt(contador) != '"') {
-            ano += jogo.charAt(contador);
-            contador++;
-        }
-        if (dia.isEmpty())
-            dia = "01";
-        if (mes.isEmpty())
-            mes = "01";
-        if (ano.isEmpty())
-            ano = "0000";
-        return dia + "/" + mes + "/" + ano;
+    public void setReleaseDate(String releasedate) {
+        this.releasedate = releasedate;
     }
 
-    // Capturando Estimated Owners
-    static int capturaEstimatedOwners(String jogo) {
-        int estimatedOwners = 0;
-        while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-            contador++;
-        }
-        contador++;
-        while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-            estimatedOwners = estimatedOwners * 10 + (jogo.charAt(contador) - '0');
-            contador++;
-        }
+    public String getReleaseDate() {
+        return releasedate;
+    }
+
+    public void setEstimatedOwners(int estimatedOwners) {
+        this.estimatedOwners = estimatedOwners;
+    }
+
+    public int getEstimatedOwners() {
         return estimatedOwners;
     }
 
-    // Capturando Price
-    static float capturaPrice(String jogo) {
-        String price = "";
-        while (contador < jogo.length() && !Character.isDigit(jogo.charAt(contador)) && jogo.charAt(contador) != 'F') {
-            contador++;
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setSupportedLanguages(String[] supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+
+    public String[] getSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    public void setMetacriticScore(int metacriticScore) {
+        this.metacriticScore = metacriticScore;
+    }
+
+    public int getMetacriticScore() {
+        return metacriticScore;
+    }
+
+    public void setUserScore(float userScore) {
+        this.userScore = userScore;
+    }
+
+    public float getUserScore() {
+        return userScore;
+    }
+
+    public void setAchievements(int achievements) {
+        this.achievements = achievements;
+    }
+
+    public int getAchievements() {
+        return achievements;
+    }
+
+    public void setPublishers(String[] publishers) {
+        this.publishers = publishers;
+    }
+
+    public String[] getPublishers() {
+        return publishers;
+    }
+
+    public void setDevelopers(String[] developers) {
+        this.developers = developers;
+    }
+
+    public String[] getDevelopers() {
+        return developers;
+    }
+
+    public void setCategories(String[] categories) {
+        this.categories = categories;
+    }
+
+    public String[] getCategories() {
+        return categories;
+    }
+
+    public void setGenres(String[] genres) {
+        this.genres = genres;
+    }
+
+    public String[] getGenres() {
+        return genres;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    // ============================================================================
+    // INTERPRETAÇÃO DE UMA LINHA DO CSV
+    // ============================================================================
+    public void read(String linhaBruta) {
+        // Ajusta a linha substituindo vírgulas “soltas” por ponto e vírgula, mantendo
+        // conteúdo entre aspas intacto
+        String linhaTratada = "";
+        boolean entreAspas = false;
+        for (int indice = 0; indice < linhaBruta.length(); indice++) {
+            char ch = linhaBruta.charAt(indice);
+
+            if (ch == '"') {
+                entreAspas = !entreAspas;
+            }
+
+            if (!entreAspas) {
+                if (ch == ',') {
+                    linhaTratada += ';';
+                } else if (ch != '\"') {
+                    linhaTratada += ch;
+                }
+            } else {
+                if (ch != '"' && ch != '[' && ch != ']') {
+                    linhaTratada += ch;
+                }
+            }
         }
-        while (contador < jogo.length() && (Character.isDigit(jogo.charAt(contador)) || jogo.charAt(contador) == '.')) {
-            price += jogo.charAt(contador);
-            contador++;
-        }
-        price = price.trim();
-        if (price.isEmpty() || price.equalsIgnoreCase("Free to play")) {
-            return 0.0f;
-        }
-        price = price.replaceAll("[^0-9.]", "");
+
+        linhaBruta = linhaTratada;
+
+        String partes[] = linhaBruta.split(";");
+
         try {
-            return Float.parseFloat(price);
-        } catch (NumberFormatException e) {
+            // BLOCO DE CONVERSÃO DOS CAMPOS NUMÉRICOS E BÁSICOS
+            setId(Integer.parseInt(partes[0]));
+            setName(partes[1]);
+            setReleaseDate(normalizeDate(partes[2]));
+            setEstimatedOwners(normalizeOwners(partes[3]));
+            setPrice(normalizePrice(partes[4]));
+
+            // CONVERSÃO DOS CAMPOS QUE SÃO LISTAS OU OPCIONAIS
+            setSupportedLanguages(parseArray(partes[5]));
+            setMetacriticScore(normalizeScore(partes[6]));
+            setUserScore(normalizeUserScore(partes[7]));
+            setAchievements(normalizeAchievements(partes[8]));
+            setPublishers(partes.length > 9 ? parseArray(partes[9]) : new String[0]);
+            setDevelopers(partes.length > 10 ? parseArray(partes[10]) : new String[0]);
+            setCategories(partes.length > 11 ? parseArray(partes[11]) : new String[0]);
+            setGenres(partes.length > 12 ? parseArray(partes[12]) : new String[0]);
+            setTags(partes.length > 13 ? parseArray(partes[13]) : new String[0]);
+
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException excecaoConversao) {
+            System.err.println("Falha ao interpretar a linha: " + linhaBruta);
+        }
+    }
+
+    private String normalizeDate(String dataBruta) {
+        // Garante um formato padrão de data; se vier vazio ou inválido, usa um valor de
+        // referência
+        if (dataBruta == null || dataBruta.trim().isEmpty()) {
+            return "01/01/1970";
+        }
+        try {
+            SimpleDateFormat formatoEntrada = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+            SimpleDateFormat formatoSaida = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataConvertida = formatoEntrada.parse(dataBruta);
+            return formatoSaida.format(dataConvertida);
+        } catch (ParseException excecaoData) {
+            return "01/01/1970";
+        }
+    }
+
+    private int normalizeOwners(String proprietariosBrutos) {
+        // Extrai apenas dígitos da string de owners e converte para inteiro
+        if (proprietariosBrutos == null || proprietariosBrutos.trim().isEmpty()) {
+            return 0;
+        }
+        String apenasNumeros = proprietariosBrutos.replaceAll("[^0-9]", "");
+        return apenasNumeros.isEmpty() ? 0 : Integer.parseInt(apenasNumeros);
+    }
+
+    private float normalizePrice(String precoBruto) {
+        // Trata o campo de preço, lidando com jogo gratuito ou valores vazios
+        if (precoBruto == null || precoBruto.trim().isEmpty() || precoBruto.equalsIgnoreCase("Free to Play")) {
+            return 0.0f;
+        }
+        try {
+            return Float.parseFloat(precoBruto);
+        } catch (NumberFormatException excecaoPreco) {
             return 0.0f;
         }
     }
 
-    // Capturando idiomas
-    static int capturaSupportedLanguages(String jogo, String[] supportedLanguages) {
-        int count = 0;
-        while (contador < jogo.length() && jogo.charAt(contador) != ']' && count < supportedLanguages.length) {
-            String lingua = "";
-            while (contador < jogo.length() && !Character.isAlphabetic(jogo.charAt(contador))) {
-                contador++;
-            }
-            while (contador < jogo.length() && jogo.charAt(contador) != ',' && jogo.charAt(contador) != ']') {
-                if (Character.isAlphabetic(jogo.charAt(contador)) || jogo.charAt(contador) == ' '
-                        || jogo.charAt(contador) == '-') {
-                    lingua += jogo.charAt(contador);
-                }
-                contador++;
-            }
-            supportedLanguages[count++] = lingua;
-        }
-        return count; // Retorna o tamanho real
-    }
-
-    // Capturando Metacritic Score
-    static int capturaMetacriticScore(String jogo) {
-        String metacriticScore = "";
-        while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-            contador++;
-        }
-        contador++;
-        while (contador < jogo.length() && Character.isDigit(jogo.charAt(contador))) {
-            metacriticScore += jogo.charAt(contador);
-            contador++;
-        }
-        if (metacriticScore.isEmpty())
+    private int normalizeScore(String pontuacaoBruta) {
+        // Converte o score para inteiro; se não for possível, usa -1 como ausência de
+        // dado
+        if (pontuacaoBruta == null || pontuacaoBruta.trim().isEmpty()) {
             return -1;
-        else
-            return Integer.parseInt(metacriticScore);
+        }
+        try {
+            return Integer.parseInt(pontuacaoBruta);
+        } catch (NumberFormatException excecaoScore) {
+            return -1;
+        }
     }
 
-    // Capturando User Score
-    static float capturaUserScore(String jogo) {
-        String userScore = "";
-        while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-            contador++;
-        }
-        contador++;
-        while (contador < jogo.length() && (Character.isDigit(jogo.charAt(contador)) || jogo.charAt(contador) == '.')) {
-            userScore += jogo.charAt(contador);
-            contador++;
-        }
-        if (userScore.isEmpty())
+    private float normalizeUserScore(String avaliacaoUsuarioBruta) {
+        // Interpreta o userScore, desconsiderando valores “tbd” ou vazios
+        if (avaliacaoUsuarioBruta == null || avaliacaoUsuarioBruta.trim().isEmpty()
+                || avaliacaoUsuarioBruta.equals("tbd")) {
             return -1.0f;
-        else
-            return Float.parseFloat(userScore);
+        }
+        try {
+            return Float.parseFloat(avaliacaoUsuarioBruta);
+        } catch (NumberFormatException excecaoUserScore) {
+            return -1.0f;
+        }
     }
 
-    // Capturando Achievements
-    static int capturaAchievements(String jogo) {
-        String achievements = "";
-        while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-            contador++;
+    private int normalizeAchievements(String conquistasBrutas) {
+        // Converte a quantidade de achievements para inteiro, assumindo zero na dúvida
+        if (conquistasBrutas == null || conquistasBrutas.trim().isEmpty()) {
+            return 0;
         }
-        contador++;
-        while (contador < jogo.length() && (Character.isDigit(jogo.charAt(contador)) || jogo.charAt(contador) == '.')) {
-            achievements += jogo.charAt(contador);
-            contador++;
+        try {
+            return Integer.parseInt(conquistasBrutas);
+        } catch (NumberFormatException excecaoAchievements) {
+            return 0;
         }
-        if (achievements.isEmpty())
-            return -1;
-        else
-            return Integer.parseInt(achievements);
     }
 
-    // Capturando Últimos Arrays
-    static int capturaUltimosArryays(String jogo, String[] categoria) {
-        int count = 0;
-        boolean teste = false;
-        while (contador < jogo.length() && !Character.isAlphabetic(jogo.charAt(contador))
-                && !Character.isDigit(jogo.charAt(contador))) {
-            if (jogo.charAt(contador) == '"')
-                teste = true;
-            contador++;
+    private String[] parseArray(String campoBruto) {
+        // Prepara os campos que representam listas para virarem vetores de String
+        if (campoBruto == null || campoBruto.trim().isEmpty() || campoBruto.equals("[]")) {
+            return new String[0];
         }
-        if (teste) {
-            while (contador < jogo.length() && jogo.charAt(contador) != '"' && count < categoria.length) {
-                String parte = "";
-                while (contador < jogo.length() && jogo.charAt(contador) != ',' && jogo.charAt(contador) != '"') {
-                    parte += jogo.charAt(contador);
-                    contador++;
-                }
-                while (contador < jogo.length() && !Character.isAlphabetic(jogo.charAt(contador))
-                        && !Character.isDigit(jogo.charAt(contador))
-                        && jogo.charAt(contador) != '"') {
-                    contador++;
-                }
-                categoria[count++] = parte; // Adiciona ao array e incrementa o contador
+
+        String conteudoLimpo = campoBruto.replace("[", "").replace("]", "").trim();
+        if (conteudoLimpo.isEmpty())
+            return new String[0];
+
+        String[] itens = conteudoLimpo.split("\\s*,\\s*");
+
+        // Remove aspas simples apenas das extremidades para não afetar palavras
+        // internas
+        for (int idx = 0; idx < itens.length; idx++) {
+            itens[idx] = itens[idx].trim();
+            if (itens[idx].startsWith("'") && itens[idx].endsWith("'") && itens[idx].length() >= 2) {
+                itens[idx] = itens[idx].substring(1, itens[idx].length() - 1);
             }
-            contador++;
+        }
+
+        return itens;
+    }
+
+    // ============================================================================
+    // LEITURA COMPLETA DO ARQUIVO CSV
+    // ============================================================================
+    public static Games[] readDb() {
+        Games vetorJogos[] = new Games[19000];
+        Scanner leitorArquivo = null;
+
+        try {
+            leitorArquivo = new Scanner(new FileReader("/tmp/games.csv"));
+            leitorArquivo.nextLine(); // pula cabeçalho
+
+            for (int indiceLinha = 0; leitorArquivo.hasNextLine(); indiceLinha++) {
+                String linhaLida = leitorArquivo.nextLine();
+                Games jogoAtual = new Games();
+
+                try {
+                    jogoAtual.read(linhaLida);
+                    vetorJogos[indiceLinha] = jogoAtual;
+                } catch (Exception excecaoProcessamento) {
+                    System.err.println("Problema ao tratar a linha " + (indiceLinha + 2) + ": "
+                            + excecaoProcessamento.getMessage());
+                }
+            }
+        } catch (FileNotFoundException excecaoArquivo) {
+            System.err.println("Não foi possível localizar o arquivo: " + excecaoArquivo.getMessage());
+        } catch (Exception erroGenerico) {
+            System.err.println("Ocorrência inesperada durante a leitura: " + erroGenerico.getMessage());
+        } finally {
+            if (leitorArquivo != null) {
+                leitorArquivo.close();
+            }
+        }
+        return vetorJogos;
+    }
+
+    public void print() {
+        System.out.print(this.id + " ## " + this.name + " ## " + this.releasedate + " ## " + this.estimatedOwners +
+                " ## " + this.price + " ## " + Arrays.toString(this.supportedLanguages) + " ## " + this.metacriticScore
+                + " ## " +
+                this.userScore + " ## " + this.achievements + " ## " + Arrays.toString(this.publishers) + " ## "
+                + Arrays.toString(this.developers) + " ## "
+                + Arrays.toString(this.categories) + " ## " + Arrays.toString(this.genres) + " ## "
+                + Arrays.toString(this.tags) + " ##");
+        System.out.println();
+    }
+}
+
+// ================================================= ÁRVORE RUBRO-NEGRA (TP07)
+// ==========================================
+
+class NoAN {
+    public Games elemento;
+    public boolean cor;
+    public NoAN esq, dir;
+
+    public NoAN(Games elemento) {
+        this(elemento, false, null, null);
+    }
+
+    public NoAN(Games elemento, boolean cor) {
+        this(elemento, cor, null, null);
+    }
+
+    public NoAN(Games elemento, boolean cor, NoAN esq, NoAN dir) {
+        this.elemento = elemento;
+        this.cor = cor;
+        this.esq = esq;
+        this.dir = dir;
+    }
+}
+
+public class Alvinegra {
+    private NoAN raiz;
+
+    public Alvinegra() {
+        raiz = null;
+    }
+
+    public boolean pesquisar(String nomeBusca) {
+        return pesquisar(nomeBusca, raiz, nomeBusca + ": =>raiz");
+    }
+
+    private boolean pesquisar(String nomeBusca, NoAN noAtual, String trajeto) {
+        // Caminho termina aqui: nó nulo indica que o elemento não foi encontrado
+        if (noAtual == null) {
+            System.out.println(trajeto + " NAO");
+            return false;
+        } else if (nomeBusca.equals(noAtual.elemento.getName())) {
+            // Se o nome do jogo bater, encerramos com sucesso
+            System.out.println(trajeto + " SIM");
+            return true;
+        } else if (nomeBusca.compareTo(noAtual.elemento.getName()) < 0) {
+            // Descida para a subárvore esquerda caso o nome procurado seja “menor”
+            return pesquisar(nomeBusca, noAtual.esq, trajeto + " esq");
         } else {
-            if (count < categoria.length) {
-                String parte = "";
-                while (contador < jogo.length() && jogo.charAt(contador) != ',') {
-                    parte += jogo.charAt(contador);
-                    contador++;
+            // Caso contrário, seguimos explorando a direita
+            return pesquisar(nomeBusca, noAtual.dir, trajeto + " dir");
+        }
+    }
+
+    public void inserir(Games novoJogo) throws Exception {
+        String chaveNome = novoJogo.getName();
+
+        if (raiz == null) {
+            // Primeiro elemento insere diretamente na raiz
+            raiz = new NoAN(novoJogo);
+
+        } else if (raiz.esq == null && raiz.dir == null) {
+            // Situação com apenas a raiz na árvore
+            if (chaveNome.compareTo(raiz.elemento.getName()) < 0) {
+                raiz.esq = new NoAN(novoJogo);
+            } else {
+                raiz.dir = new NoAN(novoJogo);
+            }
+
+        } else if (raiz.esq == null) {
+            // Quando há raiz e filho direito apenas
+            if (chaveNome.compareTo(raiz.elemento.getName()) < 0) {
+                raiz.esq = new NoAN(novoJogo);
+
+            } else if (chaveNome.compareTo(raiz.dir.elemento.getName()) < 0) {
+                raiz.esq = new NoAN(raiz.elemento);
+                raiz.elemento = novoJogo;
+
+            } else {
+                raiz.esq = new NoAN(raiz.elemento);
+                raiz.elemento = raiz.dir.elemento;
+                raiz.dir.elemento = novoJogo;
+            }
+            raiz.esq.cor = raiz.dir.cor = false;
+
+        } else if (raiz.dir == null) {
+            // Quando há raiz e filho esquerdo apenas
+            if (chaveNome.compareTo(raiz.elemento.getName()) > 0) {
+                raiz.dir = new NoAN(novoJogo);
+
+            } else if (chaveNome.compareTo(raiz.esq.elemento.getName()) > 0) {
+                raiz.dir = new NoAN(raiz.elemento);
+                raiz.elemento = novoJogo;
+
+            } else {
+                raiz.dir = new NoAN(raiz.elemento);
+                raiz.elemento = raiz.esq.elemento;
+                raiz.esq.elemento = novoJogo;
+            }
+            raiz.esq.cor = raiz.dir.cor = false;
+
+        } else {
+            // Estado geral com ambos os filhos preenchidos
+            inserir(novoJogo, null, null, null, raiz);
+        }
+        // A raiz deve sempre permanecer preta
+        raiz.cor = false;
+    }
+
+    private void inserir(Games novoJogo, NoAN noBisavo, NoAN noAvo, NoAN noPai, NoAN noAtual) throws Exception {
+        if (noAtual == null) {
+            String chaveNome = novoJogo.getName();
+            if (chaveNome.compareTo(noPai.elemento.getName()) < 0) {
+                noAtual = noPai.esq = new NoAN(novoJogo, true);
+            } else {
+                noAtual = noPai.dir = new NoAN(novoJogo, true);
+            }
+            // Se o pai é vermelho, pode haver quebra de regra da árvore rubro-negra
+            if (noPai.cor == true) {
+                balancear(noBisavo, noAvo, noPai, noAtual);
+            }
+        } else {
+
+            // Caso clássico de split de 4-no: pai com dois filhos vermelhos
+            if (noAtual.esq != null && noAtual.dir != null && noAtual.esq.cor == true && noAtual.dir.cor == true) {
+                noAtual.cor = true;
+                noAtual.esq.cor = noAtual.dir.cor = false;
+                if (noAtual == raiz) {
+                    noAtual.cor = false;
+                } else if (noPai.cor == true) {
+                    balancear(noBisavo, noAvo, noPai, noAtual);
                 }
-                categoria[count++] = parte; // Adiciona ao array e incrementa o contador
+            }
+
+            String chaveNome = novoJogo.getName();
+            int comparacao = chaveNome.compareTo(noAtual.elemento.getName());
+
+            if (comparacao < 0) {
+                inserir(novoJogo, noAvo, noPai, noAtual, noAtual.esq);
+            } else if (comparacao > 0) {
+                inserir(novoJogo, noAvo, noPai, noAtual, noAtual.dir);
+            } else {
+                throw new Exception("Erro inserir (elemento repetido)!");
             }
         }
-        // Pula a vírgula depois do array (se houver)
-        if (contador < jogo.length() && jogo.charAt(contador) == ',') {
-            contador++;
+    }
+
+    private void balancear(NoAN noBisavo, NoAN noAvo, NoAN noPai, NoAN noAtual) {
+        // Ajusta a estrutura da árvore quando aparecem duas arestas vermelhas seguidas
+        if (noPai.cor == true) {
+
+            if (noPai.elemento.getName().compareTo(noAvo.elemento.getName()) > 0) {
+                if (noAtual.elemento.getName().compareTo(noPai.elemento.getName()) > 0) {
+                    noAvo = rotacaoEsq(noAvo);
+                } else {
+                    noAvo = rotacaoDirEsq(noAvo);
+                }
+            } else {
+                if (noAtual.elemento.getName().compareTo(noPai.elemento.getName()) < 0) {
+                    noAvo = rotacaoDir(noAvo);
+                } else {
+                    noAvo = rotacaoEsqDir(noAvo);
+                }
+            }
+
+            // Reconecta o avo ao bisavô ou à raiz
+            if (noBisavo == null) {
+                raiz = noAvo;
+            } else if (noAvo.elemento.getName().compareTo(noBisavo.elemento.getName()) < 0) {
+                noBisavo.esq = noAvo;
+            } else {
+                noBisavo.dir = noAvo;
+            }
+
+            // Corrige as cores após a rotação
+            noAvo.cor = false;
+            if (noAvo.esq != null)
+                noAvo.esq.cor = true;
+            if (noAvo.dir != null)
+                noAvo.dir.cor = true;
         }
-        return count; // Retorna o tamanho real
+    }
+
+    private NoAN rotacaoDir(NoAN noPivo) {
+        // Rotação simples para a direita
+        NoAN noEsquerdo = noPivo.esq;
+        NoAN subArvoreDireitaEsq = noEsquerdo.dir;
+
+        noEsquerdo.dir = noPivo;
+        noPivo.esq = subArvoreDireitaEsq;
+
+        return noEsquerdo;
+    }
+
+    private NoAN rotacaoEsq(NoAN noPivo) {
+        // Rotação simples para a esquerda
+        NoAN noDireito = noPivo.dir;
+        NoAN subArvoreEsquerdaDir = noDireito.esq;
+
+        noDireito.esq = noPivo;
+        noPivo.dir = subArvoreEsquerdaDir;
+
+        return noDireito;
+    }
+
+    private NoAN rotacaoDirEsq(NoAN noPivo) {
+        // Rotação dupla: direita no filho, esquerda no pivô
+        noPivo.dir = rotacaoDir(noPivo.dir);
+        return rotacaoEsq(noPivo);
+    }
+
+    private NoAN rotacaoEsqDir(NoAN noPivo) {
+        // Rotação dupla: esquerda no filho, direita no pivô
+        noPivo.esq = rotacaoEsq(noPivo.esq);
+        return rotacaoDir(noPivo);
+    }
+
+    private static Games getById(Games[] vetorJogos, int idProcurado) {
+        // Percorre o vetor de jogos até encontrar o ID solicitado
+        for (int indice = 0; indice < vetorJogos.length; indice++) {
+            if (vetorJogos[indice] != null && vetorJogos[indice].getId() == idProcurado) {
+                return vetorJogos[indice];
+            }
+        }
+        return null;
+    }
+
+    // ===================== FUNÇÃO DE LOG: CRIA / ATUALIZA matrícula_alvinegra.txt
+    // =====================
+    private static void registrarLog(String mensagemLog) {
+        String nomeArquivoLog = "885_alvinegra.txt";
+        try (FileWriter escritorLog = new FileWriter(nomeArquivoLog, true)) {
+            escritorLog.write(mensagemLog + System.lineSeparator());
+        } catch (IOException erroLog) {
+            System.err.println("Não foi possível registrar a mensagem de log: " + erroLog.getMessage());
+        }
+    }
+
+    // ===================== MAIN: ENTRADA / SAÍDA CONFORME ESPECIFICAÇÃO
+    // =====================
+
+    public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        Games[] baseJogos = Games.readDb();
+
+        Alvinegra arvoreAlvinegra = new Alvinegra();
+
+        String idLido = entrada.nextLine();
+        while (!idLido.equals("FIM")) {
+            int idJogo = Integer.parseInt(idLido.trim());
+            Games jogoEncontrado = getById(baseJogos, idJogo);
+            if (jogoEncontrado != null) {
+                try {
+                    arvoreAlvinegra.inserir(jogoEncontrado);
+                } catch (Exception e) {
+                    // Em caso de inserção repetida ou erro estrutural, apenas ignora a inserção
+                }
+            }
+            idLido = entrada.nextLine();
+        }
+
+        String nomeBusca = entrada.nextLine();
+        while (!nomeBusca.equals("FIM")) {
+            arvoreAlvinegra.pesquisar(nomeBusca);
+            nomeBusca = entrada.nextLine();
+        }
+
+        entrada.close();
+
+        // Registro simples no arquivo de log ao final da execução
+        long instanteAtual = System.currentTimeMillis();
+        registrarLog("Execução finalizada em milissegundos: " + instanteAtual);
     }
 }
