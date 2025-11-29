@@ -414,7 +414,7 @@ public class ArvoreBinaria {
 
     // Escreve uma linha no arquivo de log
     private static void registrarLog(String texto) {
-        try (FileWriter fw = new FileWriter("885_binaria.txt", true)) {
+        try (FileWriter fw = new FileWriter("88_binaria.txt", true)) {
             fw.write(texto + System.lineSeparator());
         } catch (IOException e) {
             // silencioso para não atrapalhar a saída do exercício

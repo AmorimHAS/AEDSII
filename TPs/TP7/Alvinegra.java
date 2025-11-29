@@ -612,7 +612,7 @@ public class Alvinegra {
     // ===================== FUNÇÃO DE LOG: CRIA / ATUALIZA matrícula_alvinegra.txt
     // =====================
     private static void registrarLog(String mensagemLog) {
-        String nomeArquivoLog = "885_alvinegra.txt";
+        String nomeArquivoLog = "88_alvinegra.txt";
         try (FileWriter escritorLog = new FileWriter(nomeArquivoLog, true)) {
             escritorLog.write(mensagemLog + System.lineSeparator());
         } catch (IOException erroLog) {

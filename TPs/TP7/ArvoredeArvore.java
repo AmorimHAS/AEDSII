@@ -489,7 +489,7 @@ public class ArvoreDeArvore {
 
     // Log simples no arquivo pedido
     private static void registrarLog(String texto) {
-        try (FileWriter fw = new FileWriter("885_aVaV.txt", true)) {
+        try (FileWriter fw = new FileWriter("88_aVaV.txt", true)) {
             fw.write(texto + System.lineSeparator());
         } catch (IOException e) {
             // não interrompe a execução se o log falhar
